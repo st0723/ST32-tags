@@ -21,10 +21,11 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "dma.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "key.h"
+#include "ui.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +69,10 @@ int main(void)
 	SystemClock_Config();
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_DMA_Init();
 	MX_USART1_UART_Init();
+	MX_USART2_UART_Init();
+	printf("1111\n");
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */   
 	/* 创建AppTaskCreate任务 */
 	xReturn = xTaskCreate((TaskFunction_t )AppTask,  		/* 任务入口函数 */
@@ -86,10 +90,16 @@ int main(void)
 
 static void AppTask(void* parameter)
 {	
+	KEYPAD_Init();
+	UI_Init();
     while (1)
     {
-		printf("22222\n");
-		vTaskDelay(1000);
+		if((USART2_RX_STA & 0x8000)!=0)
+		{
+			printf("USART2_RX_STA\n");
+			USART2_RX_STA=0;
+		}
+		vTaskDelay(1);
     }
 }
 

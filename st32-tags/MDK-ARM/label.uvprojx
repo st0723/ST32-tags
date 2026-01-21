@@ -419,6 +419,51 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\dma.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP</GroupName>
+          <Files>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\key.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>ui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\ui.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\ui_main.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Modbus</GroupName>
+          <Files>
+            <File>
+              <FileName>modbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\modbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\modbus_crc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
