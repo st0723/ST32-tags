@@ -85,10 +85,9 @@ static void DetectKeyPress(uint8_t *key)
 			KeyMsg_t key_msg;
 			key_msg.key_value = i + 1;
 			xQueueSend(KeyBufferQueueHandle, &key_msg, 0);
-			
 		}
 		last_key[i] = key[i];
-    }
+	}
 	xSemaphoreGive(_hKeyScanMutex);
 }
 
@@ -124,7 +123,9 @@ KEY_CODE Key_BufferRead(UINT32 timeout)
 {
     BYTE code = NULL;
     if(xQueueReceive(KeyBufferQueueHandle, &code, timeout))
+	{
         return code;
+	}
     else        
         return NULL;
 	

@@ -30,6 +30,8 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "stdio.h"
+#include "string.h"
+#include <stdarg.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "FreeRTOSConfig.h"
@@ -58,6 +60,37 @@ typedef int8_t 		INT8;
 typedef int16_t 	INT16;
 typedef int32_t 	INT32;
 typedef BYTE 		BOOL;
+
+
+typedef struct
+{
+	BOOL Beep_Switch;					// 蜂鸣器开关
+	BOOL Photoelectric_Switch;			// 电眼开关
+	uint8_t Mode_Selection;				// 模式选择
+	uint8_t Speed_Grade;				// 自动模式下的速度等级
+	BOOL Missing_detection_switch;		// 漏标检测开关
+	// 漏标后自动补一个标
+	// 漏标检测时间
+	// 标卷缺标报警个数
+	// 电机连续运转时间
+	// 报警状态下能否贴标
+	// 通讯地址
+	// 标签数预警
+	// 恢复出厂设置
+	// 电眼分辨率
+	// 电眼实时信号强度
+	// 编码器脉冲数
+	// 编码器轮/辊直径
+	// 速度系数
+	// 漏标信号脉宽
+	// 延时出标时间
+	// 压标时间调整
+	// 速度校正系数
+	// 当前校正后速度
+	// 漏标检测时间系数
+	// 漏标检测时间显示
+}ST_CONFIGURATION_INFO;
+extern ST_CONFIGURATION_INFO ConfigInfo;
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

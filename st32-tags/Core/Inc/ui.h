@@ -18,6 +18,7 @@ typedef BYTE ENUM_UISTATE;
 enum
 {
     OPMODE_MAIN,                // 主操作模式
+	OPMODE_MODE_CONFIG,			//
 	ENUM_OPMODE_COUNT,          // 操作模式数量
 };
 typedef BYTE ENUM_OPMODE;
@@ -39,6 +40,7 @@ typedef struct
 
 
 BaseType_t UI_Init(void);
+void UI_OpModeChange(ENUM_OPMODE dstMode, void *param);
 
 #ifdef __cplusplus
 }

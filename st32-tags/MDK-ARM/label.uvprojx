@@ -430,6 +430,11 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\lcd.c</FilePath>
+            </File>
+            <File>
               <FileName>key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\key.c</FilePath>
@@ -448,6 +453,11 @@
               <FileName>ui_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\ui_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_mode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\ui_mode.c</FilePath>
             </File>
           </Files>
         </Group>

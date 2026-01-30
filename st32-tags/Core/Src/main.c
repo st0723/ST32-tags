@@ -24,6 +24,7 @@
 #include "dma.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "lcd.h"
 #include "key.h"
 #include "ui.h"
 /* USER CODE END Includes */
@@ -52,7 +53,7 @@
 void SystemClock_Config(void);
 static void AppTask(void* parameter);
 /* USER CODE BEGIN PFP */
-
+ST_CONFIGURATION_INFO ConfigInfo;
 /* USER CODE END PFP */
 
 static TaskHandle_t AppTask_Handle = NULL;
@@ -72,6 +73,7 @@ int main(void)
 	MX_DMA_Init();
 	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
+	MX_USART3_UART_Init();
 	printf("1111\n");
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */   
 	/* 创建AppTaskCreate任务 */
@@ -90,6 +92,7 @@ int main(void)
 
 static void AppTask(void* parameter)
 {	
+	LCD_Init();
 	KEYPAD_Init();
 	UI_Init();
     while (1)
@@ -99,7 +102,7 @@ static void AppTask(void* parameter)
 			printf("USART2_RX_STA\n");
 			USART2_RX_STA=0;
 		}
-		vTaskDelay(1);
+		vTaskDelay(20);
     }
 }
 

@@ -7,10 +7,7 @@ ST_UI_HANDLE UIHandle_Main ={OPMODE_MAIN, UIKeyEvent, UIInit};
 
 static void UIInit(ENUM_OPMODE srcMode, void *param, ENUM_OPMODE_FLAG flag)
 {
-    switch(flag)
-    {
-
-    }
+	printf("main UIInit");
 }
 
 static void UIKeyEvent(KEY_CODE key)
@@ -20,6 +17,7 @@ static void UIKeyEvent(KEY_CODE key)
         case KEY_EX_MODE:
 		{
 			printf("KEY_EX_MODE\n");
+			UI_OpModeChange(OPMODE_MODE_CONFIG, NULL);
             break;
 		}
 		case KEY_EX_UP:

@@ -1,9 +1,10 @@
 #include "ui.h"
 #include "ui_main.h"
+#include "ui_mode.h"
 
-static TaskHandle_t  UIEventTaskHandle 		= NULL;
-static SemaphoreHandle_t _hUIMutexMutex 	= NULL;
-
+static TaskHandle_t  		UIKeyEventTaskHandle 	= NULL;
+static SemaphoreHandle_t 	_hUIMutexMutex 			= NULL;
+static SemaphoreHandle_t 	UIMutexHandle			= NULL;
 typedef struct
 {
     ENUM_UISTATE State;               		// 当前UI的状态
@@ -21,10 +22,28 @@ static ST_UI_STATUS UIStatus = {
 ST_UI_HANDLE               *OpmodeTable[ENUM_OPMODE_COUNT] =
 {
     &UIHandle_Main, 
+	&UIHandle_MODEConfig,
 };
 
+
+
+/*更改用户界面*/
+void UI_OpModeChange(ENUM_OPMODE dstMode, void *param)
+{
+    BaseType_t status = xSemaphoreTake(UIMutexHandle, 0);
+    Key_BufferClear();
+	UIStatus.LastMode = UIStatus.CurrentMode;
+    UIStatus.CurrentMode = dstMode;
+    OpmodeTable[UIStatus.CurrentMode]->Init(UIStatus.LastMode, param, FLAG_NONE);
+    if(status == pdTRUE)
+    {
+        xSemaphoreGive(UIMutexHandle);
+    }
+}
+
+
 //用户界面按键事件任务
-static void UIEventTask(void const *param)
+static void UIKeyEventTask(void const *param)
 {
 	KEY_CODE code = NULL;	
 	OpmodeTable[UIStatus.CurrentMode]->Init(0, NULL, FLAG_NONE);
@@ -51,18 +70,20 @@ static void UIEventTask(void const *param)
 
 BaseType_t UI_Init(void)
 {
-
 	if(_hUIMutexMutex == NULL)
 	{
-		_hUIMutexMutex = xSemaphoreCreateMutex();		// 创建信号量
-	}	
-	xTaskCreate((TaskFunction_t )UIEventTask,  			/* 任务入口函数 */
-				(const char*    )"UIKeyEventTask",		/* 任务名字 */
-				(uint16_t       )512,  					/* 任务栈大小 */
-				(void*          )NULL,					/* 任务入口函数参数 */
-				(UBaseType_t    )1, 					/* 任务的优先级 */
-				(TaskHandle_t*  )&UIEventTaskHandle);	/* 任务控制块指针 */
-			
+		_hUIMutexMutex = xSemaphoreCreateMutex();
+	}
+	if(UIMutexHandle == NULL)
+	{
+		UIMutexHandle  = xSemaphoreCreateMutex();
+	}
+	xTaskCreate((TaskFunction_t )UIKeyEventTask,  			/* 任务入口函数 */
+				(const char*    )"UIKeyEventTask",			/* 任务名字 */
+				(uint16_t       )256,  						/* 任务栈大小 */
+				(void*          )NULL,						/* 任务入口函数参数 */
+				(UBaseType_t    )1, 						/* 任务的优先级 */
+				(TaskHandle_t*  )&UIKeyEventTaskHandle);	/* 任务控制块指针 */
     return pdPASS;
 }
 

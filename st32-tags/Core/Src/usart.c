@@ -3,6 +3,7 @@
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart2_rx;
 
 uint8_t USART2_RX_BUF[USART2_RX_LEN];     	// ¶¨Òå½ÓÊÕÊý×é
@@ -11,7 +12,7 @@ uint16_t USART2_RX_STA = 0;     			// µÚ15bit±íÊ¾Ò»Ö¡Êý¾Ý½ÓÊÕÍê³É£¬µÚ14~0Î»±íÊ¾½
 
 int fputc(int ch, FILE *f)
 {
-	HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xffff);
+	HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
 	return ch;
 }
 
@@ -50,6 +51,23 @@ void MX_USART2_UART_Init(void)
 	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);              		// Ê¹ÄÜ¿ÕÏÐÖÐ¶Ï
 }
 
+/* USART3 init function */
+
+void MX_USART3_UART_Init(void)
+{
+	huart3.Instance = USART3;
+	huart3.Init.BaudRate = 19200;
+	huart3.Init.WordLength = UART_WORDLENGTH_9B;
+	huart3.Init.StopBits = UART_STOPBITS_1;
+	huart3.Init.Parity = UART_PARITY_ODD;
+	huart3.Init.Mode = UART_MODE_TX;
+	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_HalfDuplex_Init(&huart3) != HAL_OK)
+	{
+		Error_Handler();
+	}
+}
 void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -113,6 +131,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 		HAL_NVIC_SetPriority(USART2_IRQn, 1, 0);
 		HAL_NVIC_EnableIRQ(USART2_IRQn);
 	}
+	else if(uartHandle->Instance==USART3)
+	{
+		/* USART3 clock enable */
+		__HAL_RCC_USART3_CLK_ENABLE();
+
+		__HAL_RCC_GPIOB_CLK_ENABLE();
+		/**USART3 GPIO Configuration
+		PB10     ------> USART3_TX
+		*/
+		GPIO_InitStruct.Pin = GPIO_PIN_10;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	}
 }
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
@@ -142,6 +174,16 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 		/* USART2 DMA DeInit */
 		HAL_DMA_DeInit(uartHandle->hdmarx);
 	}
+	else if(uartHandle->Instance==USART3)
+	{
+		/* Peripheral clock disable */
+		__HAL_RCC_USART3_CLK_DISABLE();
+
+		/**USART3 GPIO Configuration
+		PB10     ------> USART3_TX
+		*/
+		HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10);
+	}
 }
 
 /**
@@ -149,15 +191,14 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   */
 void USART2_IRQHandler(void)
 {
-
    if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)  					// ¿ÕÏÐÖÐ¶Ï±ê¼Ç±»ÖÃÎ»
    {   
-       __HAL_UART_CLEAR_IDLEFLAG(&huart2);  									// Çå³ýÖÐ¶Ï±ê¼Ç
-       HAL_UART_DMAStop(&huart2);           									// Í£Ö¹DMA½ÓÊÕ	   
-       USART2_RX_STA = USART2_RX_LEN - __HAL_DMA_GET_COUNTER(huart2.hdmarx);  	// ×ÜÊý¾ÝÁ¿¼õÈ¥Î´½ÓÊÕµ½µÄÊý¾ÝÁ¿ÎªÒÑ¾­½ÓÊÕµ½µÄÊý¾ÝÁ¿
-       USART2_RX_BUF[USART2_RX_STA] = 0;  										// Ìí¼Ó½áÊø·û
-       USART2_RX_STA |= 0X8000;         										// ±ê¼Ç½ÓÊÕ½áÊø
-   HAL_UART_Transmit(&huart1,USART2_RX_BUF,USART2_RX_STA&0x0FFF,100);
-       HAL_UART_Receive_DMA(&huart2, USART2_RX_BUF, USART2_RX_LEN);  			// ÖØÐÂÆô¶¯DMA½ÓÊÕ
+		__HAL_UART_CLEAR_IDLEFLAG(&huart2);  									// Çå³ýÖÐ¶Ï±ê¼Ç
+		HAL_UART_DMAStop(&huart2);           									// Í£Ö¹DMA½ÓÊÕ	   
+		USART2_RX_STA = USART2_RX_LEN - __HAL_DMA_GET_COUNTER(huart2.hdmarx);  	// ×ÜÊý¾ÝÁ¿¼õÈ¥Î´½ÓÊÕµ½µÄÊý¾ÝÁ¿ÎªÒÑ¾­½ÓÊÕµ½µÄÊý¾ÝÁ¿
+		USART2_RX_BUF[USART2_RX_STA] = 0;  										// Ìí¼Ó½áÊø·û
+		USART2_RX_STA |= 0X8000;         										// ±ê¼Ç½ÓÊÕ½áÊø
+		//HAL_UART_Transmit(&huart1,USART2_RX_BUF,USART2_RX_STA&0x0FFF,100);
+		HAL_UART_Receive_DMA(&huart2, USART2_RX_BUF, USART2_RX_LEN);  			// ÖØÐÂÆô¶¯DMA½ÓÊÕ
    }
 }
